@@ -10,7 +10,7 @@ CREATE TABLE Rooms(
     RoomID INT PRIMARY KEY AUTO_INCREMENT,
     RoomName VARCHAR(100) NOT NULL UNIQUE,
     Capacity INT NOT NULL,
-    Sttatus VARCHAR(20) NOT NULL DEFAULT 'available'
+    Status VARCHAR(20) NOT NULL DEFAULT 'available'
 )
 
 CREATE TABLE Features(
@@ -41,7 +41,7 @@ INSERT INTO Users (Username, Email, PasswordHash, role) VALUES
 ('Alejandro Peralta', 'aleper@gmail.com', 'AleRules123', 'admin'),
 ('Maria Gomez', 'mariagomez@gmail.com', 'MariaPass456', 'user')
 
-INSERT INTO Rooms (RoomName, Capacity, Sttatus) VALUES
+INSERT INTO Rooms (RoomName, Capacity, Status) VALUES
 ('Study Room Tokyo', 10, 'available'),
 ('Study Room Munich', 5, 'available')
 
