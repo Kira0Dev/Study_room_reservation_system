@@ -24,7 +24,16 @@ console.log('Connected to database:', db.config.connectionConfig.database);
 
 // Routes
 const roomsRouter = require('./routes/rooms');
+const featuresRouter = require('./routes/features');
+const roomsFeaturesRouter = require('./routes/rooms_features');
+const reservationsRouter = require('./routes/reservations');
+const authRouter = require('./routes/auth');
+
 app.use('/rooms', roomsRouter(db)); 
+app.use('/features', featuresRouter(db));
+app.use('/rooms-features', roomsFeaturesRouter(db));
+app.use('/reservations', reservationsRouter(db));
+app.use('/auth', authRouter(db));
 
 // Initialize server
 const PORT = process.env.PORT || 3000;
