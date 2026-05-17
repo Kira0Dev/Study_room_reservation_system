@@ -5,27 +5,34 @@ module.exports = (db) => {
 
     // 1. READ ALL AND FILTERS
     router.get('/', (req, res) => {
+        console.log(">>> Query received:");
+        console.log("startTime:", req.query.startTime);
+        console.log("endTime:", req.query.endTime);
+
+        
+
         const { search, capacity, features, startTime, endTime } = req.query;
 
         // First select all rooms with a default status of 'Available'
-        let selectClause = "SELECT *, 'Available' AS DynamicStatus FROM Rooms WHERE 1=1";
+        let selectClause = "SELECT *, 'Nop' AS DynamicStatus FROM Rooms WHERE 1=1";
         let params = [];
 
         // Calculate room availability based on time filters
-        if (startTime && endTime) {
+        if (endTime && startTime) {
             selectClause = `
-                SELECT *, 
+                SELECT *,
                 CASE 
                     WHEN EXISTS (
-                        SELECT 1 FROM Reservations res 
-                        WHERE res.RoomID = Rooms.RoomID 
-                        AND res.StartTime < ? 
-                        AND res.EndTime > ?
-                        AND res.Status IN ('Pendiente', 'Aprobada') -- Tus estados reales
+                        SELECT 1 
+                        FROM Reservations res
+                        WHERE res.RoomID = Rooms.RoomID
+                        AND res.StartTime <= ?
+                        AND res.EndTime >= ?
                     ) THEN 'Reserved'
                     ELSE 'Available'
                 END AS DynamicStatus
-                FROM Rooms WHERE 1=1
+                FROM Rooms
+                WHERE 1=1
             `;
             params.push(endTime, startTime);
         }
