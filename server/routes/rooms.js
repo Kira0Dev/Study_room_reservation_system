@@ -5,9 +5,6 @@ module.exports = (db) => {
 
     // 1. READ ALL AND FILTERS
     router.get('/', (req, res) => {
-        console.log(">>> Query received:");
-        console.log("startTime:", req.query.startTime);
-        console.log("endTime:", req.query.endTime);
 
         
 

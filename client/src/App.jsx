@@ -1,198 +1,66 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import React from 'react';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+
+import StudentView from './pages/StudentView';
+import Login from './pages/Login';
+import Signup from './pages/Signup';
+import AdminView from './pages/AdminView';
+
+// Este es un componente "Guardián" falso por ahora. 
+// Más adelante aquí verificaremos si existe un Token JWT o una sesión.
+const ProtectedRoute = ({ children, roleRequired }) => {
+  const token = localStorage.getItem('token');
+  const storedUser = localStorage.getItem('user');
+
+  // Si no hay token, significa que no se ha logueado
+  if (!token || !storedUser) {
+    return <Navigate to="/login" />;
+  }
+
+  const user = JSON.parse(storedUser);
+
+  // Verificamos si su rol coincide con el requerido (comparamos con user.Role de tu DB)
+  if (roleRequired && user.Role !== roleRequired) {
+    // Si un estudiante intenta entrar a admin, lo regresamos a su vista
+    if (user.Role === 'student') return <Navigate to="/student" />;
+    // Si un admin cae en rutas de estudiante por error, lo mandamos a admin
+    if (user.Role === 'admin') return <Navigate to="/admin" />;
+  }
+
+  return children;
+};
 
 function App() {
-  const [rooms, setRooms] = useState([]);
-  const [error, setError] = useState('');
-  const [successMessage, setSuccessMessage] = useState('');
-
-  const [searchTerm, setSearchTerm] = useState('');
-  const [capacity, setCapacity] = useState('');
-  const [selectedFeatures, setSelectedFeatures] = useState([]);
-
-  const [startTime, setStartTime] = useState('');
-  const [endTime, setEndTime] = useState('');
-
-  const fetchRooms = (filter = {}) => {
-    axios.get('http://localhost:3000/rooms', { params: filter })
-      .then(response => {
-        setRooms(response.data);
-      })
-      .catch(err => {
-        console.error(err);
-        setError('Unable to fetch rooms.');
-      });
-  };
-
-  useEffect(() => {
-    fetchRooms();
-  }, []);
-
-  const handleFeatureChange = (featureId) => {
-    setSelectedFeatures(prev => 
-      prev.includes(featureId) ? prev.filter(id => id !== featureId) : [...prev, featureId]
-    );
-  };
-
-  // Format HTML5 datetime-local value to MySQL DATETIME format
-  const formatDateTime = (dateTimeStr) => {
-    if (!dateTimeStr) return '';
-    return dateTimeStr.replace('T', ' ') + ':00';
-  };
-
-  const handleSearch = () => {
-    setError('');
-    const params = {};
-    if (searchTerm.trim() !== '') params.search = searchTerm;
-    if (capacity.trim() !== '') params.capacity = capacity;
-    if (selectedFeatures.length > 0) params.features = selectedFeatures.join(',');
-    
-    if (startTime && endTime) {
-      params.startTime = formatDateTime(startTime);
-      params.endTime = formatDateTime(endTime);
-    }
-
-    fetchRooms(params);
-  };
-
-  // Handle reservation creation
-  const handleMakeReservation = (roomId) => {
-    setError('');
-    setSuccessMessage('');
-
-    if (!startTime || !endTime) {
-      setError('Please select a Start and End time before reserving.');
-      return;
-    }
-
-    // Payload to POST /reservations
-    const reservationData = {
-      UserID: 1, // Change to actual logged-in user ID in a real app later
-      RoomID: roomId,
-      StartTime: formatDateTime(startTime),
-      EndTime: formatDateTime(endTime),
-      Status: 'pending' // Default status for new reservations
-    };
-
-    axios.post('http://localhost:3000/reservations', reservationData)
-      .then(response => {
-        setSuccessMessage('Reservation requested! Status: Pending review.');
-        handleSearch();
-      })
-      .catch(err => {
-        console.error(err);
-        setError('Failed to process reservation.');
-      });
-  };
-
   return (
-    <div className="container mt-5">
-      <header className="text-center mb-5">
-        <h1 className="display-4 fw-bold text-primary">Study Room Reservation System</h1>
-        <p className="lead text-muted">University Library</p>
-      </header>
+    <BrowserRouter>
+      <Routes>
+        {/* Ruta pública */}
+        <Route path="/login" element={<Login />} />
+        <Route path="/signup" element={<Signup />} />
 
-      {error && <div className="alert alert-danger">{error}</div>}
-      {successMessage && <div className="alert alert-success">{successMessage}</div>}
+        {/* Rutas Protegidas */}
+        <Route 
+          path="/student" 
+          element={
+            <ProtectedRoute roleRequired="student">
+              <StudentView />
+            </ProtectedRoute>
+          } 
+        />
 
-      <div className="mb-4">
-        <h3 className='text-center'>Looking for a specific study room?</h3>
-        <form className="d-flex" onSubmit={(e) => { e.preventDefault(); handleSearch(); }}>
-          <input 
-            className="form-control me-2" 
-            type="text" 
-            placeholder="Search by Room Name" 
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
-          <button className="btn btn-primary" type="button" onClick={handleSearch}>
-            Search
-          </button>
-        </form>
-      </div>
+        <Route 
+          path="/admin" 
+          element={
+            <ProtectedRoute roleRequired="admin">
+              <AdminView />
+            </ProtectedRoute>
+          } 
+        />
 
-      <div className='shadow-sm bg-light p-4 m-4 rounded'>
-        <h4 className='text-center'>Filters & Schedule</h4>
-        <div className='row'>
-          <div className='col-md-6 mb-3'>
-            <label className='form-label fw-bold text-secondary'>Start Date & Time</label>
-            <input 
-              type='datetime-local' 
-              className='form-control' 
-              value={startTime}
-              onChange={(e) => setStartTime(e.target.value)}
-            />
-          </div>
-          <div className='col-md-6 mb-3'>
-            <label className='form-label fw-bold text-secondary'>End Date & Time</label>
-            <input 
-              type='datetime-local' 
-              className='form-control' 
-              value={endTime}
-              onChange={(e) => setEndTime(e.target.value)}
-            />
-          </div>
-        </div>
-
-        <div className='row mt-3 justify-content-center'>
-          <div className='col-md-4 mb-3'>
-            <label className='form-label'>Minimum Capacity</label>
-            <input 
-              type='number' 
-              className='form-control' 
-              placeholder='Ex: 4' 
-              value={capacity}
-              onChange={(e) => setCapacity(e.target.value)}
-              min="1"
-            />
-          </div>
-          <div className='col-md-4 mb-3'>
-            <label className='form-label d-block'>Features</label>
-            <div className='form-check'>
-              <input className='form-check-input' type='checkbox' id='feature-1' checked={selectedFeatures.includes(1)} onChange={() => handleFeatureChange(1)} />
-              <label className='form-check-label' htmlFor='feature-1'>Whiteboard</label>
-            </div>
-            <div className='form-check'>
-              <input className='form-check-input' type='checkbox' id='feature-2' checked={selectedFeatures.includes(2)} onChange={() => handleFeatureChange(2)} />
-              <label className='form-check-label' htmlFor='feature-2'>Video Conferencing</label>
-            </div>
-            <div className='form-check'>
-              <input className='form-check-input' type='checkbox' id='feature-3' checked={selectedFeatures.includes(3)} onChange={() => handleFeatureChange(3)} />
-              <label className='form-check-label' htmlFor='feature-3'>Projector</label>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div className="row">
-        {rooms.map(room => (
-          <div className="col-md-4 mb-4" key={room.RoomID}>
-            <div className="card h-100 shadow-sm">
-              <div className="card-body">
-                <h5 className="card-title fw-bold">{room.RoomName}</h5>
-                <p className="card-text">
-                  <strong>Capacity:</strong> {room.Capacity} <br />
-                  <strong>Features:</strong> {room.features || 'Standard setup'}
-                </p>
-                <p>{room.DynamicStatus}</p>
-                <span className={`badge ${room.DynamicStatus === 'Available' ? 'bg-success' : 'bg-danger'}`}>
-                  {room.DynamicStatus}
-                </span>
-              </div>
-              <div className="card-footer bg-transparent border-top-0">
-                <button 
-                  className="btn btn-outline-primary w-100" 
-                  disabled={room.DynamicStatus !== 'Available'}
-                  onClick={() => handleMakeReservation(room.RoomID)}
-                >
-                  Make a reservation
-                </button>
-              </div>
-            </div>
-          </div>
-        ))}
-      </div>
-    </div>
+        {/* Si entran a la raíz ("/"), los redirigimos al login o al panel según prefieras */}
+        <Route path="/" element={<Navigate to="/login" />} />
+      </Routes>
+    </BrowserRouter>
   );
 }
 
