@@ -182,7 +182,6 @@ function StudentView() {
                   <strong>Capacity:</strong> {room.Capacity} <br />
                   <strong>Features:</strong> {room.features || 'Standard setup'}
                 </p>
-                <p>{room.DynamicStatus}</p>
                 <span className={`badge ${room.DynamicStatus === 'Available' ? 'bg-success' : 'bg-danger'}`}>
                   {room.DynamicStatus}
                 </span>

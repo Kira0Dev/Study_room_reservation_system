@@ -22,9 +22,9 @@ const ProtectedRoute = ({ children, roleRequired }) => {
   // Verificamos si su rol coincide con el requerido (comparamos con user.Role de tu DB)
   if (roleRequired && user.Role !== roleRequired) {
     // Si un estudiante intenta entrar a admin, lo regresamos a su vista
-    if (user.Role === 'student') return <Navigate to="/student" />;
+    if (user.Role === 'student') return <Navigate to="/StudentView" />;
     // Si un admin cae en rutas de estudiante por error, lo mandamos a admin
-    if (user.Role === 'admin') return <Navigate to="/admin" />;
+    if (user.Role === 'admin') return <Navigate to="/AdminView" />;
   }
 
   return children;
@@ -40,7 +40,7 @@ function App() {
 
         {/* Rutas Protegidas */}
         <Route 
-          path="/student" 
+          path="/StudentView" 
           element={
             <ProtectedRoute roleRequired="student">
               <StudentView />
@@ -49,7 +49,7 @@ function App() {
         />
 
         <Route 
-          path="/admin" 
+          path="/AdminView" 
           element={
             <ProtectedRoute roleRequired="admin">
               <AdminView />

@@ -15,20 +15,20 @@ module.exports = (db) => {
         let params = [];
 
         // Calculate room availability based on time filters
-        if (endTime && startTime) {
+        if (startTime && endTime) {
             selectClause = `
-                SELECT *,
+                SELECT Rooms.*, 
                 CASE 
-                    WHEN EXISTS (
-                        SELECT 1 
-                        FROM Reservations res
-                        WHERE res.RoomID = Rooms.RoomID
-                        AND res.StartTime <= ?
-                        AND res.EndTime >= ?
-                    ) THEN 'Reserved'
+                    WHEN res.RoomID IS NOT NULL THEN 'Reserved'
                     ELSE 'Available'
-                END AS DynamicStatus
-                FROM Rooms
+                END AS DynamicStatus,
+                res.ReservationID,
+                res.Status AS ReservationStatus
+                FROM Rooms 
+                LEFT JOIN Reservations res ON res.RoomID = Rooms.RoomID 
+                AND res.StartTime <= ? 
+                AND res.EndTime >= ?
+                AND res.Status IN ('pending', 'approved')
                 WHERE 1=1
             `;
             params.push(endTime, startTime);
@@ -39,13 +39,13 @@ module.exports = (db) => {
 
         // Filter by name (search)
         if (search) {
-            sql += ' AND RoomName LIKE ?';
+            sql += ' AND Rooms.RoomName LIKE ?';
             params.push(`%${search}%`);
         }
 
         // Filter by capacity
         if (capacity) {
-            sql += ' AND Capacity >= ?';
+            sql += ' AND Rooms.Capacity >= ?';
             params.push(Number(capacity));
         }
 
@@ -54,7 +54,7 @@ module.exports = (db) => {
             const featureList = features.split(',').map(Number);
             if (featureList.length > 0) {
                 const placeholders = featureList.map(() => '?').join(',');
-                sql += ` AND RoomID IN (
+                sql += ` AND Rooms.RoomID IN (
                     SELECT RoomID
                     FROM Rooms_Features
                     WHERE FeatureID IN (${placeholders})

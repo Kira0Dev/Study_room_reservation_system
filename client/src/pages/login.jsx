@@ -27,9 +27,9 @@ function Login() {
 
         // Redirect based on user role
         if (user.Role === 'admin') {
-          navigate('/admin');
+          navigate('/AdminView');
         } else {
-          navigate('/student');
+          navigate('/StudentView');
         }
       })
       .catch(err => {
