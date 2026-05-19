@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
+
 function StudentView() {
   const [rooms, setRooms] = useState([]);
   const [error, setError] = useState('');
@@ -23,6 +24,7 @@ function StudentView() {
         setError('Unable to fetch rooms.');
       });
   };
+
 
   useEffect(() => {
     fetchRooms();

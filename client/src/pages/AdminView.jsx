@@ -333,9 +333,9 @@ function AdminView() {
                       {room.ReservationStatus === 'approved' && (
                         <button 
                           className="btn btn-secondary btn-sm w-100 mt-1"
-                          onClick={() => handleUpdateReservationStatus(room.ReservationID, 'cancelled')}
+                          onClick={() => handleUpdateReservationStatus(room.ReservationID, 'finished')}
                         >
-                          Revoke / Close Check-in
+                          Close Check-in
                         </button>
                       )}
                     </div>

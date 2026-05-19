@@ -2,6 +2,32 @@ const express = require('express');
 const router = express.Router();
 
 module.exports = (db) => {
+
+    /*implement to return all features of a room on a "feature1, feature2, feature3" format
+    SELECT f.FeatureName
+    FROM Rooms_Features rf
+    JOIN Features f ON rf.FeatureID = f.FeatureID
+    WHERE rf.RoomID = 1
+    GROUP BY f.FeatureName
+    */
+
+    router.get('/room/:id', (req, res) => {
+        const { id } = req.params;
+    
+        const query = `
+            SELECT GROUP_CONCAT(f.FeatureName SEPARATOR ', ') AS features
+            FROM Rooms_Features rf
+            JOIN Features f ON rf.FeatureID = f.FeatureID
+            WHERE rf.RoomID = ?
+        `;
+
+        db.query(query, [id], (err, results) => {
+            if (err) return res.status(500).json({ error: err.message });
+            const features = results[0]?.features || "";
+            res.json({ features });
+        });
+    });
+    /*
     // 1. READ ALL
     router.get('/', (req, res) => {
         db.query('SELECT * FROM Reservations', (err, results) => {
@@ -9,7 +35,7 @@ module.exports = (db) => {
             res.json(results);
         });
     });
-
+    */
     // 2. CREATE
     router.post('/', (req, res) => {
         const {RoomID, FeatureID} = req.body;

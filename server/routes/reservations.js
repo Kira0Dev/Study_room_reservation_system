@@ -22,8 +22,8 @@ module.exports = (db) => {
     // 3. UPDATE
     router.put('/:id', (req, res) => {
         const { id } = req.params;
-        const { UserID, RoomID, StartTime, EndTime, Status } = req.body;
-        db.query('UPDATE Reservations SET UserID = ?, RoomID = ?, StartTime = ?, EndTime = ?, Status = ? WHERE id = ?', [UserID, RoomID, StartTime, EndTime, Status, id], (err, results) => {
+        const {Status } = req.body;
+        db.query('UPDATE Reservations SET Status = ? WHERE ReservationID = ?', [Status, id], (err, results) => {
             if (err) return res.status(500).json({ error: err.message });
             if (results.affectedRows === 0) return res.status(404).json({ message: 'Reservation not found' });
             res.json({ message: 'Reservation updated successfully' });
@@ -33,7 +33,7 @@ module.exports = (db) => {
     // 4. DELETE
     router.delete('/:id', (req, res) => {
         const { id } = req.params;
-        db.query('DELETE FROM Reservations WHERE id = ?', [id], (err, results) => {
+        db.query('DELETE FROM Reservations WHERE ReservationID = ?', [id], (err, results) => {
             if (err) return res.status(500).json({ error: err.message });
             if (results.affectedRows === 0) return res.status(404).json({ message: 'Reservation not found' });
             res.json({ message: 'Reservation deleted successfully' });
