@@ -1,0 +1,32 @@
+name: React CI Pipeline
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Obtain repository code
+      uses: actions/checkout@v3
+
+    - name: Configure Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18'
+
+    - name: Install Frontend dependencies
+      working-directory: ./client
+      run: npm install
+
+    - name: Run UI Tests (Vitest)
+      working-directory: ./client
+      run: npm run test
+
+    - name: Build the application for production (Build)
+      working-directory: ./client
+      run: npm run build
