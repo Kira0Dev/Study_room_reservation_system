@@ -6,25 +6,24 @@ import Login from './pages/Login';
 import Signup from './pages/Signup';
 import AdminView from './pages/AdminView';
 
-// Este es un componente "Guardián" falso por ahora. 
-// Más adelante aquí verificaremos si existe un Token JWT o una sesión.
+
 const ProtectedRoute = ({ children, roleRequired }) => {
   const token = localStorage.getItem('token');
   const storedUser = localStorage.getItem('user');
 
-  // Si no hay token, significa que no se ha logueado
+  //if there's no token or user info, redirect to login
   if (!token || !storedUser) {
     return <Navigate to="/login" />;
   }
 
   const user = JSON.parse(storedUser);
 
-  // Verificamos si su rol coincide con el requerido (comparamos con user.Role de tu DB)
-  if (roleRequired && user.Role !== roleRequired) {
-    // Si un estudiante intenta entrar a admin, lo regresamos a su vista
-    if (user.Role === 'student') return <Navigate to="/StudentView" />;
-    // Si un admin cae en rutas de estudiante por error, lo mandamos a admin
-    if (user.Role === 'admin') return <Navigate to="/AdminView" />;
+  // verify user role matches the required role for this route
+  if (roleRequired && user.role !== roleRequired) {
+    // Redirect students to StudentView
+    if (user.role === 'student') return <Navigate to="/StudentView" />;
+    // Redirect admins to AdminView
+    if (user.role === 'admin') return <Navigate to="/AdminView" />;
   }
 
   return children;
@@ -34,11 +33,11 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
-        {/* Ruta pública */}
+        {/* Public Pages */}
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
 
-        {/* Rutas Protegidas */}
+        {/* Protected Routes */}
         <Route 
           path="/StudentView" 
           element={
@@ -57,7 +56,7 @@ function App() {
           } 
         />
 
-        {/* Si entran a la raíz ("/"), los redirigimos al login o al panel según prefieras */}
+        {/* If users navigate to the root path, redirect them to login or their respective dashboard */}
         <Route path="/" element={<Navigate to="/login" />} />
       </Routes>
     </BrowserRouter>

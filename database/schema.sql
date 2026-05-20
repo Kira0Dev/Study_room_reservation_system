@@ -59,3 +59,6 @@ INSERT INTO Rooms_Features (RoomID, FeatureID) VALUES
 INSERT INTO Reservations (UserID, RoomID, StartTime, EndTime, Status) VALUES
 (1, 1, '2024-07-01 10:00:00', '2024-07-01 12:00:00', 'in progress'),
 (2, 2, '2024-07-02 14:00:00', '2024-07-02 16:00:00', 'pending')
+
+INSERT INTO Features (FeatureName) VALUES
+('Computer')

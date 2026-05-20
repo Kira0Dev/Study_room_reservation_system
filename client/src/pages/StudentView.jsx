@@ -4,6 +4,7 @@ import axios from 'axios';
 
 function StudentView() {
   const [rooms, setRooms] = useState([]);
+  const [features, setFeatures] = useState([]);
   const [error, setError] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
 
@@ -25,9 +26,21 @@ function StudentView() {
       });
   };
 
+  const fetchFeatures = () => {
+    Promise.all([
+      axios.get('http://localhost:3000/rooms'),
+      axios.get('http://localhost:3000/features')
+    ])
+    .then(([roomsRes, featuresRes]) => {
+      setRooms(roomsRes.data);
+      setFeatures(featuresRes.data);
+    })
+    .catch(err => console.error(err));
+  };
 
   useEffect(() => {
     fetchRooms();
+    fetchFeatures();
   }, []);
 
   const handleFeatureChange = (featureId) => {
@@ -192,20 +205,25 @@ function StudentView() {
               min="1"
             />
           </div>
-          <div className='col-md-4 mb-3'>
-            <label className='form-label d-block'>Features</label>
-            <div className='form-check'>
-              <input className='form-check-input' type='checkbox' id='feature-1' checked={selectedFeatures.includes(1)} onChange={() => handleFeatureChange(1)} />
-              <label className='form-check-label' htmlFor='feature-1'>Whiteboard</label>
-            </div>
-            <div className='form-check'>
-              <input className='form-check-input' type='checkbox' id='feature-2' checked={selectedFeatures.includes(2)} onChange={() => handleFeatureChange(2)} />
-              <label className='form-check-label' htmlFor='feature-2'>Video Conferencing</label>
-            </div>
-            <div className='form-check'>
-              <input className='form-check-input' type='checkbox' id='feature-3' checked={selectedFeatures.includes(3)} onChange={() => handleFeatureChange(3)} />
-              <label className='form-check-label' htmlFor='feature-3'>Projector</label>
-            </div>
+          <div className='col-md-5 mb-3'>
+            <label className='form-label d-block fw-semibold'>Features</label>
+            <div className="d-flex gap-3 mt-2">
+              {features.length === 0 && <span className="text-muted">Cargando features…</span>}
+              {features.map(feat => (
+                <div className='form-check' key={feat.FeatureID}>
+                  <input
+                    className='form-check-input'
+                    type='checkbox'
+                    id={`feat-${feat.FeatureID}`}
+                    checked={selectedFeatures.includes(feat.FeatureID)}
+                    onChange={() => handleFeatureChange(feat.FeatureID)}
+                  />
+                  <label className='form-check-label' htmlFor={`feat-${feat.FeatureID}`}>
+                    {feat.FeatureName}
+                  </label>
+                </div>
+              ))}
+            </div>  
           </div>
         </div>
       </div>
