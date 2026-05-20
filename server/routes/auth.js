@@ -6,7 +6,7 @@ const jwt = require('jsonwebtoken');
 module.exports = (db) => {
 
     router.post('/register', async (req, res) => {
-        const { Username, Email, PasswordHash, Role } = req.body;
+        const { Username, Email, PasswordHash, role } = req.body;
 
         if (!Username || !Email || !PasswordHash) {
             return res.status(400).json({ message: 'Please fill in all required fields.' });
@@ -18,7 +18,7 @@ module.exports = (db) => {
             const hashedPassword = await bcrypt.hash(PasswordHash, salt);
 
             // Assign default role if not provided
-            const userRole = Role || 'student';
+            const userRole = role || 'student';
 
             const sql = 'INSERT INTO Users (Username, Email, PasswordHash, Role) VALUES (?, ?, ?, ?)';
             db.query(sql, [Username, Email, hashedPassword, userRole], (err, result) => {
@@ -61,7 +61,7 @@ module.exports = (db) => {
 
             // Create JWT token if login is successful
             const token = jwt.sign(
-                { UserID: user.UserID, Role: user.Role, Username: user.Username },
+                { UserID: user.UserID, role: user.role, Username: user.Username },
                 process.env.JWT_SECRET,
                 { expiresIn: '2h' } 
             );
@@ -73,7 +73,7 @@ module.exports = (db) => {
                     UserID: user.UserID,
                     Username: user.Username,
                     Email: user.Email,
-                    Role: user.Role
+                    role: user.role
                 }
             });
         });

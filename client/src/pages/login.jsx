@@ -26,7 +26,7 @@ function Login() {
         localStorage.setItem('user', JSON.stringify(user));
 
         // Redirect based on user role
-        if (user.Role === 'admin') {
+        if (user.role === 'admin') {
           navigate('/AdminView');
         } else {
           navigate('/StudentView');

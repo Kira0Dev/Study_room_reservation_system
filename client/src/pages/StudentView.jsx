@@ -44,6 +44,42 @@ function StudentView() {
 
   const handleSearch = () => {
     setError('');
+
+    //Start and end time validation
+    if (!startTime || !endTime) {
+      alert("Both start and end times are required");
+      return;
+    }
+
+    const start = new Date(startTime);
+    const end = new Date(endTime);
+    const now = new Date();
+
+    if (start < now) {
+      alert("Start time cannot be in the past");
+      return;
+    }
+
+    if (end <= start) {
+      alert("End time must be after start time");
+      return;
+    }
+
+    const diffMs = end - start;
+    const maxDuration = 4 * 60 * 60 * 1000; // 4 hours
+
+    if (diffMs > maxDuration) {
+      alert("Reservations cannot be longer than 4 hours");
+      return;
+    }
+
+    const minDuration = 30 * 60 * 1000; // 30 minutes
+
+    if (diffMs < minDuration) {
+      alert("Reservations must be at least 30 minutes long");
+      return;
+    }
+
     const params = {};
     if (searchTerm.trim() !== '') params.search = searchTerm;
     if (capacity.trim() !== '') params.capacity = capacity;
@@ -74,10 +110,9 @@ function StudentView() {
       setError('Your session expired. Please log in again.');
       return;
     }
-
     // Payload to POST /reservations
     const reservationData = {
-      UserID: user.ID, // Use the actual logged-in user ID
+      UserID: user.UserID, // Use the actual logged-in user ID
       RoomID: roomId,
       StartTime: formatDateTime(startTime),
       EndTime: formatDateTime(endTime),
@@ -94,6 +129,7 @@ function StudentView() {
         setError('Failed to process reservation.');
       });
   };
+
 
   return (
     <div className="container mt-5">
