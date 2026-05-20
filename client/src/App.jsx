@@ -3,7 +3,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 
 import StudentView from './pages/StudentView';
 import Login from './pages/login';
-import Signup from './pages/Signup';
+import Signup from './pages/signup';
 import AdminView from './pages/AdminView';
 
 
