@@ -17,7 +17,7 @@ function Login() {
       PasswordHash: password 
     };
 
-    axios.post('http://localhost:3000/auth/login', loginData) //I think is like that.
+    axios.post(`${import.meta.env.VITE_API_URL}/auth/login`, loginData)
       .then(response => {
         const { token, user } = response.data;
 

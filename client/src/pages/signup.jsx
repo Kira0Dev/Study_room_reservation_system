@@ -22,7 +22,7 @@ function Signup() {
             Role: role
         };
 
-        axios.post('http://localhost:3000/auth/register', signupData)
+        axios.post(`${import.meta.env.VITE_API_URL}/auth/register`, signupData)
             .then(response => {
                 navigate('/login');
             })

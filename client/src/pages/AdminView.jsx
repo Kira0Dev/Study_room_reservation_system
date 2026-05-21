@@ -21,7 +21,7 @@ function AdminView() {
   const [formFeatures, setFormFeatures] = useState([]); 
 
   const fetchRooms = (filter = {}) => {
-    axios.get('http://localhost:3000/rooms', { params: filter })
+    axios.get(`${import.meta.env.VITE_API_URL}/rooms`, { params: filter })
       .then(response => setRooms(response.data))
       .catch(err => {
         console.error(err);
@@ -31,8 +31,8 @@ function AdminView() {
 
   const fetchFeatures = () => {
     Promise.all([
-      axios.get('http://localhost:3000/rooms'),
-      axios.get('http://localhost:3000/features')
+      axios.get(`${import.meta.env.VITE_API_URL}/rooms`),
+      axios.get(`${import.meta.env.VITE_API_URL}/features`)
     ])
     .then(([roomsRes, featuresRes]) => {
       setRooms(roomsRes.data);
@@ -119,7 +119,7 @@ function AdminView() {
     setError('');
     setSuccessMessage('');
 
-    axios.put(`http://localhost:3000/reservations/${reservationId}`, { Status: newStatus })
+    axios.put(`${import.meta.env.VITE_API_URL}/reservations/${reservationId}`, { Status: newStatus })
       .then(() => {
         setSuccessMessage(`Reservation status updated to: ${newStatus}`);
         handleSearch(); // Refresh the view
@@ -153,7 +153,7 @@ function AdminView() {
     };
 
     if (isEditing) {
-      axios.put(`http://localhost:3000/rooms/${editingRoomId}`, roomData)
+      axios.put(`${import.meta.env.VITE_API_URL}/rooms/${editingRoomId}`, roomData)
         .then(() => {
           setSuccessMessage('Room updated successfully.');
           resetForm();
@@ -162,7 +162,7 @@ function AdminView() {
         .catch(err => setError(err.response?.data?.message || 'Error updating room.'));
     } else {
       // Create new room
-      axios.post('http://localhost:3000/rooms', roomData)
+      axios.post(`${import.meta.env.VITE_API_URL}/rooms`, roomData)
         .then(() => {
           setSuccessMessage('New room created successfully.');
           resetForm();
@@ -185,7 +185,7 @@ function AdminView() {
     if (window.confirm('Are you sure you want to delete this room? This action cannot be undone.')) {
       setError('');
       setSuccessMessage('');
-      axios.delete(`http://localhost:3000/rooms/${roomId}`)
+      axios.delete(`${import.meta.env.VITE_API_URL}/rooms/${roomId}`)
         .then(() => {
           setSuccessMessage('Room deleted completely.');
           handleSearch();
@@ -221,7 +221,7 @@ function AdminView() {
       Status: 'pending' // Default status for new reservations
     };
 
-    axios.post('http://localhost:3000/reservations', reservationData)
+    axios.post(`${import.meta.env.VITE_API_URL}/reservations`, reservationData)
       .then(response => {
         setSuccessMessage('Reservation requested! Status: Pending review.');
         handleSearch();

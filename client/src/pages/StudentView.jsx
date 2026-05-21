@@ -16,7 +16,7 @@ function StudentView() {
   const [endTime, setEndTime] = useState('');
 
   const fetchRooms = (filter = {}) => {
-    axios.get('http://localhost:3000/rooms', { params: filter })
+    axios.get(`${import.meta.env.VITE_API_URL}/rooms`, { params: filter })
       .then(response => {
         setRooms(response.data);
       })
@@ -28,8 +28,8 @@ function StudentView() {
 
   const fetchFeatures = () => {
     Promise.all([
-      axios.get('http://localhost:3000/rooms'),
-      axios.get('http://localhost:3000/features')
+      axios.get(`${import.meta.env.VITE_API_URL}/rooms`),
+      axios.get(`${import.meta.env.VITE_API_URL}/features`)
     ])
     .then(([roomsRes, featuresRes]) => {
       setRooms(roomsRes.data);
@@ -132,7 +132,7 @@ function StudentView() {
       Status: 'pending' // Default status for new reservations
     };
 
-    axios.post('http://localhost:3000/reservations', reservationData)
+    axios.post(`${import.meta.env.VITE_API_URL}/reservations`, reservationData)
       .then(response => {
         setSuccessMessage('Reservation requested! Status: Pending review.');
         handleSearch();

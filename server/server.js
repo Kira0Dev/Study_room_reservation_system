@@ -38,5 +38,11 @@ app.use('/auth', authRouter(db));
 // Initialize server
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-    console.log(`Servidor corriendo en http://localhost:${PORT}`);
+    console.log(`Server running on port ${PORT}`);
 });
+
+const cors = require('cors');
+app.use(cors({
+    origin: 'https://study-room-reservation-system.vercel.app/ ',
+    credentials: true
+}));
