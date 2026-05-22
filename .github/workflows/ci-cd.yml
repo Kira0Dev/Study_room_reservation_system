@@ -13,22 +13,22 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Obtener el código del repositorio
+      - name: Obtain source code
         uses: actions/checkout@v4
 
-      - name: Configurar Node.js
+      - name: Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20'
 
-      - name: Instalar dependencias del Frontend
+      - name: Install frontend dependencies
         working-directory: ./client
         run: npm install
 
-      - name: Ejecutar UI Tests (Vitest)
+      - name: Execute tests (Vitest)
         working-directory: ./client
         run: npm run test
 
-      - name: Construir la aplicación para producción (Build)
+      - name: Build app in production (Build)
         working-directory: ./client
         run: npm run build
